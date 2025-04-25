@@ -33,7 +33,7 @@ document.getElementById('imc-form').addEventListener('submit', function (e) {
     }
 });
 
-// Bhaskara Form
+// Bhaskara
 document.getElementById('bhaskara-form').addEventListener('submit', function (e) {
     e.preventDefault();
 
