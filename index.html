@@ -1,13 +1,287 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Algoritmos em Javascript para calcular IMC e resolver equações quadráticas usando a fórmula de Bhaskara."
+    />
+    <meta
+      name="keywords"
+      content="Javascript, IMC, Bhaskara, Algoritmos, Programação, Cálculo de IMC, Fórmula de Bhaskara"
+    />
+    <meta name="author" content="Arthur Diógenes" />
     <title>Algoritmos Javascript</title>
-</head>
-<body>
-    <h1>Javascript</h1>
-    <h2>Calculadora de IMC e Formula de Bhaskara</h2>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              pastel: {
+                blue: "#A0C4FF",
+                pink: "#FFC6FF",
+                green: "#9BF6FF",
+                yellow: "#FDFFB6",
+                purple: "#BDB2FF",
+                background: "#f8f9fa",
+              },
+            },
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+            },
+            boxShadow: {
+              glass: "0 8px 32px 0 rgba(31, 38, 135, 0.07)",
+            },
+          },
+        },
+      };
+    </script>
+    <style type="text/tailwindcss">
+      @layer utilities {
+        .glass {
+          background: rgba(255, 255, 255, 0.25);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        .tab-active {
+          @apply bg-white text-pastel-purple font-medium shadow-md;
+        }
+        .input-field {
+          @apply w-full p-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-pastel-purple focus:border-transparent outline-none transition-all;
+        }
+        .btn-primary {
+          @apply px-6 py-3 bg-pastel-purple text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:bg-opacity-90;
+        }
+        .card-container {
+          @apply glass rounded-2xl p-8 shadow-glass;
+        }
+      }
+    </style>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="bg-gradient-to-br from-pastel-blue via-pastel-background to-pastel-pink min-h-screen p-8 font-sans"
+  >
+    <div class="max-w-5xl mx-auto">
+      <!-- Header -->
+      <header class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">
+          Algoritmos em Javascript
+        </h1>
+        <p class="text-gray-600 max-w-2xl mx-auto">
+          Calculadora de IMC e resolução de equações quadráticas usando a
+          fórmula de Bhaskara
+        </p>
+      </header>
+
+      <!-- Navigation Tabs -->
+      <div class="flex justify-center mb-8">
+        <div class="glass rounded-full p-1 flex space-x-1">
+          <button
+            id="tab-imc"
+            class="tab-active px-6 py-2 rounded-full transition-all"
+            onclick="switchTab('imc')"
+          >
+            Cálculo de IMC
+          </button>
+          <button
+            id="tab-bhaskara"
+            class="px-6 py-2 rounded-full transition-all"
+            onclick="switchTab('bhaskara')"
+          >
+            Fórmula de Bhaskara
+          </button>
+        </div>
+      </div>
+
+      <!-- Content Container -->
+      <div class="relative">
+        <!-- IMC Section -->
+        <section id="section-imc" class="card-container">
+          <div class="text-center mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800">Cálculo de IMC</h2>
+            <p class="text-gray-600 mt-2">
+              Calcule seu Índice de Massa Corporal
+            </p>
+          </div>
+
+          <form id="imc-form" class="space-y-6">
+            <div class="grid grid-cols-2 gap-6">
+              <div>
+                <label
+                  for="peso"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Peso (kg)</label
+                >
+                <input type="number" id="peso" class="input-field" required />
+              </div>
+              <div>
+                <label
+                  for="altura"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Altura (m)</label
+                >
+                <input
+                  type="number"
+                  id="altura"
+                  step="0.01"
+                  class="input-field"
+                  required
+                />
+              </div>
+            </div>
+            <button type="submit" class="btn-primary w-full">
+              Calcular IMC
+            </button>
+          </form>
+
+          <div
+            id="resultado-imc"
+            class="mt-8 p-4 rounded-lg bg-white bg-opacity-50 hidden"
+          >
+            <h3 class="text-xl font-medium text-gray-800 mb-2">
+              Seu resultado:
+            </h3>
+            <div
+              id="imc-valor"
+              class="text-3xl font-bold text-center text-pastel-purple mb-4"
+            ></div>
+            <div id="imc-classificacao" class="text-lg text-center"></div>
+
+            <div class="mt-6 grid grid-cols-2 gap-4 text-sm">
+              <div class="p-3 rounded-lg bg-white">
+                <p class="font-medium">Abaixo de 18.5</p>
+                <p class="text-gray-600">Abaixo do peso</p>
+              </div>
+              <div class="p-3 rounded-lg bg-white">
+                <p class="font-medium">18.5 a 24.9</p>
+                <p class="text-gray-600">Peso normal</p>
+              </div>
+              <div class="p-3 rounded-lg bg-white">
+                <p class="font-medium">25 a 29.9</p>
+                <p class="text-gray-600">Sobrepeso</p>
+              </div>
+              <div class="p-3 rounded-lg bg-white">
+                <p class="font-medium">30 a 34.9</p>
+                <p class="text-gray-600">Obesidade grau 1</p>
+              </div>
+              <div class="p-3 rounded-lg bg-white">
+                <p class="font-medium">35 a 39.9</p>
+                <p class="text-gray-600">Obesidade grau 2</p>
+              </div>
+              <div class="p-3 rounded-lg bg-white">
+                <p class="font-medium">40 ou mais</p>
+                <p class="text-gray-600">Obesidade grau 3</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Bhaskara Section -->
+        <section id="section-bhaskara" class="card-container hidden">
+          <div class="text-center mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800">
+              Fórmula de Bhaskara
+            </h2>
+            <p class="text-gray-600 mt-2">
+              Resolva equações quadráticas do tipo ax² + bx + c = 0
+            </p>
+          </div>
+
+          <div class="mb-6 p-4 rounded-lg bg-white bg-opacity-50">
+            <div class="text-center text-xl font-medium">
+              <span class="text-pastel-purple">ax²</span> +
+              <span class="text-pastel-blue">bx</span> +
+              <span class="text-pastel-pink">c</span> = 0
+            </div>
+          </div>
+
+          <form id="bhaskara-form" class="space-y-6">
+            <div class="grid grid-cols-3 gap-6">
+              <div>
+                <label
+                  for="a"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Valor de a</label
+                >
+                <input type="number" id="a" class="input-field" required />
+              </div>
+              <div>
+                <label
+                  for="b"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Valor de b</label
+                >
+                <input type="number" id="b" class="input-field" required />
+              </div>
+              <div>
+                <label
+                  for="c"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Valor de c</label
+                >
+                <input type="number" id="c" class="input-field" required />
+              </div>
+            </div>
+            <button type="submit" class="btn-primary w-full">
+              Calcular Raízes
+            </button>
+          </form>
+
+          <div
+            id="resultado-bhaskara"
+            class="mt-8 p-4 rounded-lg bg-white bg-opacity-50 hidden"
+          >
+            <h3 class="text-xl font-medium text-gray-800 mb-2">Resultado:</h3>
+
+            <div class="mt-4 space-y-4">
+              <div class="p-4 rounded-lg bg-white">
+                <p class="font-medium text-gray-700">Delta (Δ):</p>
+                <p
+                  id="delta-valor"
+                  class="text-xl font-bold text-pastel-purple"
+                ></p>
+              </div>
+
+              <div id="raizes-container" class="grid grid-cols-2 gap-4">
+                <div class="p-4 rounded-lg bg-white">
+                  <p class="font-medium text-gray-700">x₁:</p>
+                  <p
+                    id="x1-valor"
+                    class="text-xl font-bold text-pastel-blue"
+                  ></p>
+                </div>
+                <div class="p-4 rounded-lg bg-white">
+                  <p class="font-medium text-gray-700">x₂:</p>
+                  <p
+                    id="x2-valor"
+                    class="text-xl font-bold text-pastel-pink"
+                  ></p>
+                </div>
+              </div>
+
+              <div id="sem-raizes" class="p-4 rounded-lg bg-white hidden">
+                <p class="text-center text-gray-700">
+                  Esta equação não possui raízes reais.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Footer -->
+      <footer class="mt-12 text-center text-gray-600">
+        <p>&copy; 2023 Arthur Diógenes. Todos os direitos reservados.</p>
+      </footer>
+    </div>
+
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
